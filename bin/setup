@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+
+# Prevent the script from being ran multiple times simultaneously
+trap "rm -f setup.lock; exit 1" INT TERM
+export TOP_PID=$$
+[[ -f setup.lock ]] && echo 'Setup alreaady running; exiting...' && exit
+touch setup.lock
+
+# Define some helper functions
+successfully() {
+  $* || (echo "----- failed" 1>&2 && kill -s TERM $TOP_PID)
+}
+
+append_log() {
+  $* >> log/setup.log
+}
+
+quietly() {
+  $* > /dev/null 2>&1
+}
+
+# Create the log file for this file
+append_log successfully mkdir -p tmp
+append_log successfully touch log/setup.log
+append_log successfully echo "\n\n----- Starting bin/setup"
+
+# This script assumes your project uses bundler; Welcome new comers
+if [ ! -d .bundle ]; then
+  echo "Oh. Hello there. Haven't seen you before..."
+  echo "This may take a second. Grab a snickers. Or something healthy."
+  echo "Tail the log/setup.log if you get bored."
+  echo
+
+  # Assume they haven't setup heroku remotes either
+  # See http://ericboehs.com/post/sharing-a-team-heroku-account for heroku.work setup
+  PROJECT_NAME=$(cd ..;basename $(pwd))
+  quietly git remote add staging git@heroku.work:$PROJECT_NAME-staging.git
+  quietly git remote add qa git@heroku.work:$PROJECT_NAME-qa.git
+  quietly git remote add production git@heroku.work:$PROJECT_NAME-production.git
+  quietly git config heroku.account work
+  quietly git config heroku.remote staging
+  quietly git remote update
+fi
+
+# Assuming your project uses dotenv gem, copy a .env over from .env.example
+if [ ! -f .env ]; then
+  #TODO: Don't try to cp if .env.example doesn't exist
+  echo "Creating .env file from example. Please edit it!"
+  successfully cp .env.example .env
+fi
+
+# WITH_DEP=true bin/setup will install system dependencies (mac only)
+if [ -n "$WITH_DEP" ]; then
+  echo "Checking system dependencies..."
+  # Ubuntu/Debian support was once working; Here it determines if you're on a mac or debian
+  IS_MAC=false; IS_DEBIAN=false
+  [[ -f /etc/debian_version ]] && IS_DEBIAN=true
+  [[ $(command -v sw_vers) && $(sw_vers -productVersion | cut -f2 -d.) -ge 7 ]] && IS_MAC=true
+
+  if $IS_MAC; then
+    # Use brewdler to install everything needed in the Brewfile
+    append_log gem list -i brewdler || gem install brewdler --no-rdoc --no-ri
+    append_log successfully brewdle install
+
+    # Init a postgres db (it will fail gracefully if one is already created)
+    append_log initdb /usr/local/var/postgres -E utf8
+
+    # Auto load postgresql, memcache and redis at start up (and now)
+    ln -sfv /usr/local/opt/postgresql/*.plist ~/Library/LaunchAgents
+    ln -sfv /usr/local/opt/memcached/*.plist ~/Library/LaunchAgents
+    ln -sfv /usr/local/opt/redis/*.plist ~/Library/LaunchAgents
+    append_log launchctl load ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist
+    append_log launchctl load ~/Library/LaunchAgents/homebrew.mxcl.memcached.plist
+    append_log launchctl load ~/Library/LaunchAgents/homebrew.mxcl.redis.plist
+
+    echo "#TODO: setup postgresql user"
+
+    # Tell em how to dynamically add ruby to PATH
+    echo $PATH | grep $(cd $(which gem)/..;pwd) > /dev/null
+    [[ $? -ne 0 ]] && echo 'For ruby gems to work, add the current path to your profile (.bashrc, .zshrc, etc):
+    export PATH="$(cd $(which gem)/..;pwd):$PATH"'
+  fi
+fi
+
+echo "Installing libraries..."
+append_log successfully gem list -i bundler || gem install bundler
+append_log successfully bundle install --path vendor/bundle --binstubs vendor/bundle/bin
+
+# Flush all the memcaches
+ps ax | grep "memcache[d]" > /dev/null
+if [ $? -eq 0 ]; then
+  command -v nc > /dev/null
+  if [ $? -eq 0 ]; then
+    echo "Flushing Memcache..."
+    append_log successfully echo -e "flush_all\nquit\n" | nc 127.0.0.1 11211
+  else
+    echo "WARNING: Please install netcat for automatic flushing of memcache"
+  fi
+fi
+
+# Flush all the redises
+ps ax | grep "re[d]is" > /dev/null
+if [ $? -eq 0 ]; then
+  echo "Flushing Redis..."
+  append_log successfully redis-cli FlushDB
+fi
+
+# Reset database and seed it
+if [ -z "$KEEPDB" ]; then
+  echo "Reloading the database..."
+  append_log successfully bundle exec rake db:migrate:reset db:seed
+fi
+
+# If pow is running issue it a restart
+ps ax | grep "pow$" > /dev/null
+if [ $? -eq 0 ]; then
+  echo "Restarting Pow..."
+  touch tmp/restart.txt
+fi
+
+# Clean up
+rm -f setup.lock
+echo "All done!"
