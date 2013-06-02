@@ -108,7 +108,7 @@ fi
 # Reset database and seed it
 if [ -z "$KEEPDB" ]; then
   echo "Reloading the database..."
-  append_log successfully bundle exec rake db:migrate:reset db:seed
+  append_log successfully bundle exec rake db:migrate:reset db:seed db:test:prepare
 fi
 
 # If pow is running issue it a restart
