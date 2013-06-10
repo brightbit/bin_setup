@@ -47,6 +47,17 @@ if [ ! -f .env ]; then
   #TODO: Don't try to cp if .env.example doesn't exist
   echo "Creating .env file from example. Please edit it!"
   successfully cp .env.example .env
+else
+  MISSING_ENV_VARS=$(comm -13 <(cut -f1 -d= <.env|sort) <(cut -f1 -d= <.env.example|sort))
+  if [[ -n $MISSING_ENV_VARS ]]; then
+    echo "###############################################################################"
+    echo "You are missing the following ENV vars in .env:"
+    echo $MISSING_ENV_VARS
+    echo
+    echo "Please copy these missing variables from: \`heroku config -s\`"
+    echo "###############################################################################"
+    echo
+  fi
 fi
 
 # WITH_DEP=true bin/setup will install system dependencies (mac only)
