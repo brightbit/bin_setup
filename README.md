@@ -59,6 +59,25 @@ WITH_DEP=true bin/setup
 KEEP_DB=true bin/setup
 ```
 
+## Your Project's README
+
+You'll probably want to make note of how to get started on your project. Here's a simple README to get started:
+
+```markdown
+
+Welcome to the team
+===================
+
+To get started run:
+    cd ~/Code
+    git clone https://github.com/brightbit/project_abc.git # First time you'll need user/pass (then add it to keychain)
+    bin/setup
+    heroku config -s # Set the variables in .env from here
+    rails s # And open http://localhost:3000
+```
+
+We are entertaining the idea of using something like `heroku config -s > .env`. If you do [let us know](mailto:hello@brightbit.com) how it works out.
+
 ## Information
 ### Conventions
 
