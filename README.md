@@ -71,6 +71,7 @@ Welcome to the team
 To get started run:
     cd ~/Code
     git clone https://github.com/brightbit/project_abc.git # First time you'll need user/pass (then add it to keychain)
+    cd project_abc
     bin/setup
     heroku config -s # Set the variables in .env from here
     rails s # And open http://localhost:3000
