@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Prevent the script from being ran multiple times simultaneously
+# Prevent the script from being run multiple times simultaneously
 trap "rm -f setup.lock; exit 1" INT TERM
 export TOP_PID=$$
 [[ -f setup.lock ]] && echo 'Setup alreaady running; exiting...' && exit
