@@ -48,7 +48,7 @@ if [ ! -f .env ]; then
   echo "Creating .env file from example. Please edit it!"
   successfully cp .env.example .env
 else
-  MISSING_ENV_VARS=$(comm -13 <(cut -f1 -d= <.env|sort) <(cut -f1 -d= <.env.example|sort))
+  MISSING_ENV_VARS=$(comm -13 <(cut -f1 -d= <.env|sed -e 's/^export\ //g'|grep -Ev "^\#"| sort) <(cut -f1 -d= <.env.example|sed -e 's/^export\ //g'|grep -Ev "^\#"|sort)|sed '/^$/d')
   if [[ -n $MISSING_ENV_VARS ]]; then
     echo "###############################################################################"
     echo "You are missing the following ENV vars in .env:"
