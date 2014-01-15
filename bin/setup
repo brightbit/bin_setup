@@ -42,6 +42,12 @@ if [ ! -d .bundle ]; then
   quietly git remote update
 fi
 
+# Assuming your project uses direnv, allow the .envrc file
+if [ ! -f .envrc ]; then
+  successfully direnv allow .envrc
+  successfully direnv reload
+fi
+
 # Assuming your project uses dotenv gem, copy a .env over from .env.example
 if [ ! -f .env ]; then
   #TODO: Don't try to cp if .env.example doesn't exist
