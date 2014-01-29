@@ -87,7 +87,7 @@ Bin setup assumes you are using:
 * [Homebrew](http://mxcl.github.io/homebrew/) for installing packages (e.g. postgres, redis, memcache)
 * [Bundler](http://gembundler.com/) with binstubs at vendor/bundle/bin. It installs and runs bundle install (setting your binstubs up for you).
 * [Brewdler](https://github.com/andrew/brewdler) - It installs and runs brewdle.
-* [Direnv](https://github.com/zimbatm/direnv) - It installs for you. You'll need a .envrc in place pointing to your bundler binstubs (for now).
+* `.git/safe/../../bin` in your `$PATH`; [See](https://github.com/ericboehs/dotfiles/blob/dd4554382f0344c9a5da9ae77e9f2ac445c25df1/shell/zsh/zshrc#L47-49)
 * [Dotenv](https://github.com/bkeepers/dotenv) - It copies .env.example to .env and compares the two. Alerts devs if they are missing .env vars.
 * Heroku - And that you have your apps named the same as the current directory with -staging, -qa and -production on then end (e.g. bin_setup-production). If you don't it should fail silently.
 

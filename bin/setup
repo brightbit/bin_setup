@@ -43,9 +43,8 @@ if [ ! -d .bundle ]; then
 fi
 
 # Assuming your project uses direnv, allow the .envrc file
-if [ ! -f .envrc ]; then
-  successfully direnv allow .envrc
-  successfully direnv reload
+if [ ! -f .git/safe ]; then
+  successfully mkdir .git/safe
 fi
 
 # Assuming your project uses dotenv gem, copy a .env over from .env.example
