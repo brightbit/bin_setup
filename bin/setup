@@ -20,6 +20,7 @@ quietly() {
 }
 
 # Create the log file for this file
+successfully mkdir -p log
 append_log successfully mkdir -p tmp
 append_log successfully touch log/setup.log
 append_log successfully echo "\n\n----- Starting bin/setup"
@@ -48,21 +49,25 @@ if [ ! -f .git/safe ]; then
 fi
 
 # Assuming your project uses dotenv gem, copy a .env over from .env.example
-if [ ! -f .env ]; then
-  #TODO: Don't try to cp if .env.example doesn't exist
-  echo "Creating .env file from example. Please edit it!"
-  successfully cp .env.example .env
-else
-  MISSING_ENV_VARS=$(comm -13 <(cut -f1 -d= <.env|sed -e 's/^export\ //g'|grep -Ev "^\#"| sort) <(cut -f1 -d= <.env.example|sed -e 's/^export\ //g'|grep -Ev "^\#"|sort)|sed '/^$/d')
-  if [[ -n $MISSING_ENV_VARS ]]; then
-    echo "###############################################################################"
-    echo "You are missing the following ENV vars in .env:"
-    echo $MISSING_ENV_VARS
-    echo
-    echo "Please copy these missing variables from: \`heroku config -s\`"
-    echo "###############################################################################"
-    echo
+if [ -f .env.example ]; then
+  if [ ! -f .env ]; then
+    #TODO: Don't try to cp if .env.example doesn't exist
+    echo "Creating .env file from example. Please edit it!"
+    successfully cp .env.example .env
+  else
+    MISSING_ENV_VARS=$(comm -13 <(cut -f1 -d= <.env|sed -e 's/^export\ //g'|grep -Ev "^\#"| sort) <(cut -f1 -d= <.env.example|sed -e 's/^export\ //g'|grep -Ev "^\#"|sort)|sed '/^$/d')
+    if [[ -n $MISSING_ENV_VARS ]]; then
+      echo "###############################################################################"
+      echo "You are missing the following ENV vars in .env:"
+      echo $MISSING_ENV_VARS
+      echo
+      echo "Please copy these missing variables from: \`heroku config -s\`"
+      echo "###############################################################################"
+      echo
+    fi
   fi
+else
+  append_log echo "No .env.example file found; Skipping"
 fi
 
 # WITH_DEP=true bin/setup will install system dependencies (mac only)
@@ -122,7 +127,7 @@ if [ $? -eq 0 ]; then
 fi
 
 # Reset database and seed it
-if [ -z "$KEEPDB" ]; then
+if [ -z "$KEEPDB" ] && [ -f config/database.yml ]; then
   echo "Reloading the database..."
   append_log successfully bundle exec rake db:drop:all db:create:all db:migrate
   append_log successfully bundle exec rake db:seed db:test:prepare
