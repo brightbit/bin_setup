@@ -51,7 +51,6 @@ fi
 # Assuming your project uses dotenv gem, copy a .env over from .env.example
 if [ -f .env.example ]; then
   if [ ! -f .env ]; then
-    #TODO: Don't try to cp if .env.example doesn't exist
     echo "Creating .env file from example. Please edit it!"
     successfully cp .env.example .env
   else
