@@ -129,7 +129,7 @@ fi
 if [ -z "$KEEPDB" ] && [ -f config/database.yml ]; then
   echo "Reloading the database..."
   append_log successfully bundle exec rake db:drop:all db:create:all db:migrate
-  append_log successfully bundle exec rake db:seed db:test:prepare
+  append_log successfully bundle exec rake db:seed
 fi
 
 # If pow is running issue it a restart
