@@ -33,11 +33,9 @@ if [ ! -d .bundle ]; then
   echo
 
   # Assume they haven't setup heroku remotes either
-  # See http://ericboehs.com/post/sharing-a-team-heroku-account for heroku.work setup
   PROJECT_NAME=$(cd ..;basename $(pwd))
-  quietly git remote add staging git@heroku.work:$PROJECT_NAME-staging.git
-  quietly git remote add qa git@heroku.work:$PROJECT_NAME-qa.git
-  quietly git remote add production git@heroku.work:$PROJECT_NAME-production.git
+  quietly git remote add staging git@heroku.com:$PROJECT_NAME-staging.git
+  quietly git remote add production git@heroku.com:$PROJECT_NAME-production.git
   quietly git config heroku.account work
   quietly git config heroku.remote staging
   quietly git remote update
