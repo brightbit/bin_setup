@@ -92,11 +92,6 @@ if [ -n "$WITH_DEP" ]; then
     append_log launchctl load ~/Library/LaunchAgents/homebrew.mxcl.redis.plist
 
     echo "#TODO: setup postgresql user"
-
-    # Tell em how to dynamically add ruby to PATH
-    echo $PATH | grep $(cd $(which gem)/..;pwd) > /dev/null
-    [[ $? -ne 0 ]] && echo 'For ruby gems to work, add the current path to your profile (.bashrc, .zshrc, etc):
-    export PATH="$(cd $(which gem)/..;pwd):$PATH"'
   fi
 fi
 
