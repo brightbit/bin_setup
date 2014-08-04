@@ -78,9 +78,7 @@ if [ -n "$WITH_DEP" ]; then
   [[ $(command -v sw_vers) && $(sw_vers -productVersion | cut -f2 -d.) -ge 7 ]] && IS_MAC=true
 
   if $IS_MAC; then
-    # Use brewdler to install everything needed in the Brewfile
-    append_log gem list -i brewdler || gem install brewdler --no-rdoc --no-ri
-    append_log successfully brewdle install
+    append_log successfully brew bundle
 
     # Init a postgres db (it will fail gracefully if one is already created)
     append_log initdb /usr/local/var/postgres -E utf8
