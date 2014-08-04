@@ -5,18 +5,15 @@ By [Brightbit](http://brightbit.com).
 
 Make new developers like you.
 
-**Bin Setup** aims to easily setup your Rails 3.2/4.0 app on a new machine. It also helps reset your app back to a clean state. It will reset redis, memcache and your postgres database.
+**Bin Setup** aims to easily setup your Rails 4.2 app on a new machine. It also helps reset your app back to a clean state. It will reset redis, memcache and your postgres database.
 
 ## Installation
 
 Create a bin/setup (or script/setup) file in your Rails project. From the root of your project run:
 
 ```bash
-# Rails 4:
-echo 'bash -c "$(curl -s https://raw.github.com/brightbit/bin_setup/master/bin/setup)"' > bin/setup
-
-# Rails 3:
-echo 'bash -c "$(curl -s https://raw.github.com/brightbit/bin_setup/master/bin/setup)"' > script/setup
+echo 'bash -c "$(curl -sL https://raw.github.com/brightbit/bin_setup/master/bin/setup)"' > bin/setup
+chmod +x bin/setup
 ```
 
 ## Usage
@@ -102,7 +99,7 @@ It also assumes you:
 ### Todo
 
 * Document .env.example and how to set it up (gitignore, Dotenv)
-* Add databases.rake override files (3.2 and 4.0) for resetting the DB while rails is running
+* Add databases.rake override files (4.x) for resetting the DB while rails is running
 * Add a .envrc to the project if one doesn't exist
 * Add a .env.example to the project if one doesn't exist
 * Make it happy with pow (it already is but I think you have to symlink .powenv to .env)
