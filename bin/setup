@@ -78,8 +78,10 @@ if [ -n "$WITH_DEP" ]; then
   if $IS_MAC; then
     append_log brew bundle
 
-    # Init a postgres db (it will fail gracefully if one is already created)
-    append_log initdb /usr/local/var/postgres -E utf8
+    if [ "$(ls -A /usr/local/var/postgress 2>/dev/null|wc -l)" -eq 0 ]; then
+      # Init a postgres db (it will fail gracefully if one is already created)
+      append_log initdb /usr/local/var/postgres -E utf8
+    fi
 
     # Auto load postgresql, memcache and redis at start up (and now)
     ln -sfv /usr/local/opt/postgresql/*.plist ~/Library/LaunchAgents
