@@ -112,8 +112,11 @@ fi
 # Flush all the redises
 ps ax | grep "re[d]is" > /dev/null
 if [ $? -eq 0 ]; then
-  echo "Flushing Redis..."
-  append_log successfully redis-cli FlushDB
+  command -v redis-cli > /dev/null
+  if [ $? -eq 0 ]; then
+    echo "Flushing Redis..."
+    append_log successfully redis-cli FlushDB
+  fi
 fi
 
 # Reset database and seed it
