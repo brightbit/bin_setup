@@ -108,6 +108,13 @@ echo "Installing libraries..."
 append_log successfully gem list -i bundler || gem install bundler
 append_log successfully bundle install --path vendor/bundle --binstubs vendor/bundle/bin
 
+# Reset database and seed it
+if [ -z "$KEEPDB" ] && [ -f config/database.yml ]; then
+  echo "Reloading the database..."
+  append_log successfully bundle exec rake db:drop:all db:create:all db:migrate
+  append_log successfully bundle exec rake db:seed
+fi
+
 # Flush all the memcaches
 ps ax | grep "memcache[d]" > /dev/null
 if [ $? -eq 0 ]; then
@@ -128,13 +135,6 @@ if [ $? -eq 0 ]; then
     echo "Flushing Redis..."
     append_log successfully redis-cli FlushDB
   fi
-fi
-
-# Reset database and seed it
-if [ -z "$KEEPDB" ] && [ -f config/database.yml ]; then
-  echo "Reloading the database..."
-  append_log successfully bundle exec rake db:drop:all db:create:all db:migrate
-  append_log successfully bundle exec rake db:seed
 fi
 
 # If pow is running issue it a restart
