@@ -89,15 +89,15 @@ if [ -n "$WITH_DEP" ]; then
     ln -sfv /usr/local/opt/redis/*.plist ~/Library/LaunchAgents
 
     if [ -f ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist ]; then
-      append_log launchctl load ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist
+      append_log launchctl load -w ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist
     fi
 
     if [ -f ~/Library/LaunchAgents/homebrew.mxcl.memcached.plist ]; then
-      append_log launchctl load ~/Library/LaunchAgents/homebrew.mxcl.memcached.plist
+      append_log launchctl load -w ~/Library/LaunchAgents/homebrew.mxcl.memcached.plist
     fi
 
     if [ -f ~/Library/LaunchAgents/homebrew.mxcl.redis.plist ]; then
-      append_log launchctl load ~/Library/LaunchAgents/homebrew.mxcl.redis.plist
+      append_log launchctl load -w ~/Library/LaunchAgents/homebrew.mxcl.redis.plist
     fi
 
     echo "#TODO: setup postgresql user"
